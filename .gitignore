@@ -1,0 +1,7 @@
+out
+build
+.gradle
+.idea
+gocd-plugins-gradle-helper.iml
+gocd-plugins-gradle-helper.ipr
+gocd-plugins-gradle-helper.iws
