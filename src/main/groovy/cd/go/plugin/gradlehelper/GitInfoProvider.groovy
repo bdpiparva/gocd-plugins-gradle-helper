@@ -1,5 +1,8 @@
 package cd.go.plugin.gradlehelper
 
+import cd.go.plugin.gradlehelper.utils.StringUtils
+
+
 class GitInfoProvider {
     static boolean isGitRepo(String dir) {
         return "git -C ${dir} rev-parse".execute().waitFor() == 0
@@ -9,7 +12,7 @@ class GitInfoProvider {
         if (isGitRepo(dir)) {
             def process = "git log -n 1 --format=%H".execute(null, new File(dir))
             process.waitFor()
-            return success(process) ? process.text : null
+            return success(process) ? StringUtils.chomp(process.text) : null
         }
 
         throw new RuntimeException("Ouch! Not a git repo.")

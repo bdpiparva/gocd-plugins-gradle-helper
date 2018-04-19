@@ -41,6 +41,7 @@ class GradleHelperPluginFunctionalTest extends Specification {
                 .build()
 
         then:
+        println "================================"
         println result.output
         result.output.contains('true')
         result.task(":extensionInfo").outcome == SUCCESS
