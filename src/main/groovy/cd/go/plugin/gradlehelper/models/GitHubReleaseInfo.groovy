@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package cd.go.plugin.gradlehelper
+package cd.go.plugin.gradlehelper.models
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-
-class HelloTask extends DefaultTask {
-    @TaskAction
-    void doSomethin() {
-        println GitInfoProvider.isGitRepo()
-    }
+class GitHubReleaseInfo {
+    String baseUrl = "https://api.github.com"
+    String acceptHeader = 'application/vnd.github.v3+json'
+    String owner
+    String repo
+    String token
+    String tagName
+    String targetCommitish = "master"
+    String name
+    String body
+    String[] assets
+    boolean prerelease = false
+    boolean draft = false
 }

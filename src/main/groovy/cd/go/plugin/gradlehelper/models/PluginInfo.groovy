@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cd.go.plugin.gradlehelper
+package cd.go.plugin.gradlehelper.models
 
 import org.gradle.api.GradleException
 import org.slf4j.Logger

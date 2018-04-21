@@ -17,6 +17,8 @@
 package cd.go.plugin.gradlehelper
 
 import cd.go.plugin.gradlehelper.license_report.LicenseReportConfig
+import cd.go.plugin.gradlehelper.models.GitHubReleaseInfo
+import cd.go.plugin.gradlehelper.models.PluginInfo
 import groovy.json.JsonBuilder
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
@@ -27,11 +29,13 @@ import org.gradle.api.model.ObjectFactory
 class GradleHelperExtension {
     boolean prettyTestOutput
     final PluginInfo pluginInfo
+    final GitHubReleaseInfo github
     final LicenseReportConfig licenseReport
 
     @javax.inject.Inject
     GradleHelperExtension(ObjectFactory objectFactory, Project project) {
         pluginInfo = objectFactory.newInstance(PluginInfo)
+        github = objectFactory.newInstance(GitHubReleaseInfo)
         licenseReport = objectFactory.newInstance(LicenseReportConfig, project)
     }
 
@@ -43,7 +47,10 @@ class GradleHelperExtension {
         action.execute(licenseReport)
     }
 
-
+    void github(Action<? super GitHubReleaseInfo> action) {
+        action.execute(github)
+    }
+    
     @Override
     String toString() {
         return new JsonBuilder(

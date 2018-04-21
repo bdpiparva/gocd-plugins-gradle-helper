@@ -41,7 +41,11 @@ class GradleHelperPluginFunctionalTest extends Specification {
             
             gocdPlugin {
                 pluginInfo {
-                    id = 'foo'
+                    id = 'cd.go.scm.github'
+                    name = "GitHub plugin"
+                    version = '0.0.1'
+                    group = 'cd.go'
+                    serverVersion = '18.2.0'
                 }
                 licenseReport {
                     licenseCheck = true
@@ -73,7 +77,11 @@ class GradleHelperPluginFunctionalTest extends Specification {
             
             gocdPlugin {
                 pluginInfo {
-                    id = 'foo'
+                    id = 'cd.go.scm.github'
+                    name = "GitHub plugin"
+                    version = '0.0.1'
+                    group = 'cd.go'
+                    serverVersion = '18.2.0'
                 }
                 licenseReport {
                     licenseCheck = true
@@ -103,7 +111,11 @@ class GradleHelperPluginFunctionalTest extends Specification {
             
             gocdPlugin {
                 pluginInfo {
-                    id = 'foo'
+                    id = 'cd.go.scm.github'
+                    name = "GitHub plugin"
+                    version = '0.0.1'
+                    group = 'cd.go'
+                    serverVersion = '18.2.0'
                 }
                 licenseReport {
                     licenseCheck = true
