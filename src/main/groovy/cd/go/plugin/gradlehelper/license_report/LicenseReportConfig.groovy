@@ -51,7 +51,7 @@ class LicenseReportConfig {
         outputDir = "${project.buildDir}/reports/dependency-license"
         renderer = new NoticeFileGenerator(outputDir, allowedLicenses)
         configurations = ['runtime']
-        excludeGroups = [project.group]
+        excludeGroups = ["${project.group}"]
         excludes = []
         importers = []
         filters = []
