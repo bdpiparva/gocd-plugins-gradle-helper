@@ -27,7 +27,8 @@ import org.gradle.api.model.ObjectFactory
 
 @CompileStatic
 class GradleHelperExtension {
-    boolean prettyTestOutput
+    boolean prettyTestOutput = true
+    boolean showJavaCompilationWarnings = true
     final PluginInfo pluginInfo
     final GitHubReleaseInfo github
     final LicenseReportConfig licenseReport
@@ -50,7 +51,7 @@ class GradleHelperExtension {
     void github(Action<? super GitHubReleaseInfo> action) {
         action.execute(github)
     }
-    
+
     @Override
     String toString() {
         return new JsonBuilder(

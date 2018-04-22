@@ -24,6 +24,7 @@ import com.github.jk1.license.LicenseReportPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
 class GradleHelperPlugin implements Plugin<Project> {
@@ -42,20 +43,41 @@ class GradleHelperPlugin implements Plugin<Project> {
             GradleHelperExtension gocdPlugin = project.extensions.gocdPlugin
             gocdPlugin.pluginInfo.validate()
 
-            if (GitInfoProvider.isGitRepo(project.projectDir.absolutePath)) {
-                project.version = "${gocdPlugin.pluginInfo.version}-${GitInfoProvider.gitRevisionCount(project.projectDir.absolutePath)}"
-            } else {
-                project.version = gocdPlugin.pluginInfo.version
-            }
+            setupProjectVersion(project, gocdPlugin)
+            configurePrettyTestLogging(project, gocdPlugin)
+            showCompilationWarnings(project, gocdPlugin)
+        }
+    }
 
-            if (gocdPlugin.prettyTestOutput) {
-                project.tasks.withType(Test) { test ->
-                    if (project.plugins.findPlugin('java')) {
-                        test.testLogging.minGranularity = -2
-                    }
-                    test.addTestListener(new PrettyTestLogger())
-                    test.addTestOutputListener(new PrettyTestLogger())
+    private static void showCompilationWarnings(Project project, GradleHelperExtension gocdPlugin) {
+        if (gocdPlugin.showJavaCompilationWarnings) {
+            project.tasks.withType(JavaCompile) { java ->
+                java.options.deprecation = true
+                java.options.warnings = true
+                java.options.encoding = 'utf-8'
+                java.options.compilerArgs << "-Xlint:all"
+                java.options.compilerArgs << "-Xlint:-serial"
+                java.logger
+            }
+        }
+    }
+
+    private static void setupProjectVersion(Project project, GradleHelperExtension gocdPlugin) {
+        if (GitInfoProvider.isGitRepo(project.projectDir.absolutePath)) {
+            project.version = "${gocdPlugin.pluginInfo.version}-${GitInfoProvider.gitRevisionCount(project.projectDir.absolutePath)}"
+        } else {
+            project.version = gocdPlugin.pluginInfo.version
+        }
+    }
+
+    private static void configurePrettyTestLogging(Project project, GradleHelperExtension gocdPlugin) {
+        if (gocdPlugin.prettyTestOutput) {
+            project.tasks.withType(Test) { test ->
+                if (project.plugins.findPlugin('java')) {
+                    test.testLogging.minGranularity = -2
                 }
+                test.addTestListener(new PrettyTestLogger())
+                test.addTestOutputListener(new PrettyTestLogger())
             }
         }
     }
