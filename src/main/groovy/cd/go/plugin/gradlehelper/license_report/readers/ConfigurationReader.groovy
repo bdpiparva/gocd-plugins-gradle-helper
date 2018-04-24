@@ -19,7 +19,6 @@ package cd.go.plugin.gradlehelper.license_report.readers
 import cd.go.plugin.gradlehelper.models.ConfigurationInfo
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ResolvedDependency
 
 class ConfigurationReader {
 
@@ -33,10 +32,10 @@ class ConfigurationReader {
 
             configuration.resolvedConfiguration // force configuration resolution
 
-            Set<ResolvedDependency> dependencies = new TreeSet<ResolvedDependency>(new ResolvedDependencyComparator())
-            for (ResolvedDependency dependency : configuration.resolvedConfiguration.getFirstLevelModuleDependencies()) {
-                collectDependencies(dependencies, dependency)
-            }
+//            Set<ResolvedDependency> dependencies = new TreeSet<ResolvedDependency>(new ResolvedDependencyComparator())
+//            for (ResolvedDependency dependency : configuration.resolvedConfiguration.getFirstLevelModuleDependencies()) {
+//                collectDependencies(dependencies, dependency)
+//            }
         }
     }
 
@@ -45,7 +44,7 @@ class ConfigurationReader {
             return
         }
         for (Configuration configuration : toReport) {
-            data.configurations.add(configurationReader.read(project, configuration))
+//            data.configurations.add(configurationReader.read(project, configuration))
         }
     }
 }

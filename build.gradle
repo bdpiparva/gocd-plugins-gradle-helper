@@ -54,7 +54,7 @@ dependencies {
     extraLibs 'gradle.plugin.com.github.jk1:gradle-license-report:0.6.1'
     extraLibs group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.10.0'
     extraLibs group: 'org.zeroturnaround', name: 'zt-zip', version: '1.12'
-
+    extraLibs group: 'commons-io', name: 'commons-io', version: '2.6'
 
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'junit:junit:4.12'

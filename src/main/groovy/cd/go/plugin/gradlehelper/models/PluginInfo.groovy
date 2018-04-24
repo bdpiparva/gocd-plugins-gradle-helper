@@ -16,9 +16,13 @@
 
 package cd.go.plugin.gradlehelper.models
 
+import cd.go.plugin.gradlehelper.GitInfoProvider
 import org.gradle.api.GradleException
+import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import javax.inject.Inject
 
 class PluginInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginInfo.class)
@@ -29,6 +33,19 @@ class PluginInfo {
     String serverVersion = ''
     String vendorName = ''
     String vendorUrl = ''
+    String distVersion = ''
+    String gitRevision = ''
+
+    @Inject
+    PluginInfo(Project project) {
+        def projectDir = project.projectDir.absolutePath
+        if (GitInfoProvider.isGitRepo(projectDir)) {
+            distVersion = GitInfoProvider.gitRevisionCount(projectDir)
+            gitRevision = GitInfoProvider.gitRevision(projectDir)
+        }
+
+        project.version = fullVersion
+    }
 
     Map<String, String> toHash() {
         return ['id'           : id,
@@ -38,7 +55,18 @@ class PluginInfo {
                 'vendorUrl'    : vendorUrl,
                 'vendorName'   : vendorName,
                 'serverVersion': serverVersion,
+                'distVersion'  : distVersion,
+                'gitRevision'  : gitRevision,
+                'fullVersion'  : fullVersion
         ]
+    }
+
+    String getFullVersion() {
+        if (distVersion?.trim()?.isEmpty()) {
+            return version
+        } else {
+            return "$version-$distVersion"
+        }
     }
 
     void validate() {

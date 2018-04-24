@@ -19,7 +19,7 @@ package cd.go.plugin.gradlehelper
 import cd.go.plugin.gradlehelper.pretty_test.PrettyTestLogger
 import cd.go.plugin.gradlehelper.tasks.ExtensionInfoTask
 import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
-import cd.go.plugin.gradlehelper.tasks.HelloTask
+import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
 import com.github.jk1.license.LicenseReportPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,7 +36,7 @@ class GradleHelperPlugin implements Plugin<Project> {
 
         project.tasks.create('extensionInfo', ExtensionInfoTask)
         project.tasks.create('githubRelease', GitHubReleaseTask)
-        project.tasks.create('hello', HelloTask)
+        project.tasks.create('publishToS3', PublishToS3Task)
 
         project.afterEvaluate {
             //TODO: Move it to doFirst of possible
