@@ -41,30 +41,17 @@ repositories {
     gradlePluginPortal()
 }
 
-configurations {
-    extraLibs
-}
-
-configurations.compile.extendsFrom(configurations.extraLibs)
-
 dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'org.codehaus.groovy:groovy-all:2.4.12'
-    extraLibs 'gradle.plugin.com.github.jk1:gradle-license-report:0.6.1'
-    extraLibs group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.10.0'
-    extraLibs group: 'org.zeroturnaround', name: 'zt-zip', version: '1.12'
-    extraLibs group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.10.0'
+    compile group: 'org.zeroturnaround', name: 'zt-zip', version: '1.12'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'junit:junit:4.12'
     testCompile gradleTestKit()
-}
-
-jar {
-    from {
-        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
-    }
 }
 
 gradlePlugin {
@@ -95,10 +82,5 @@ jar {
                 'Implementation-Version': version,
                 'Main-Class': 'cd.go.plugin.gradlehelper.GradleHelperPlugin'
         )
-    }
-
-    from(configurations.compile) {
-        include 'gradle-license-report-0.6.1.jar'
-        into "lib/"
     }
 }

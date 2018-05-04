@@ -20,7 +20,6 @@ import cd.go.plugin.gradlehelper.pretty_test.PrettyTestLogger
 import cd.go.plugin.gradlehelper.tasks.ExtensionInfoTask
 import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
 import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
-import com.github.jk1.license.LicenseReportPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -30,16 +29,14 @@ import org.gradle.api.tasks.testing.Test
 class GradleHelperPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        project.pluginManager.apply(LicenseReportPlugin.class)
         project.pluginManager.apply(JavaPlugin.class)
-        project.extensions.create('gocdPlugin', GradleHelperExtension, project.objects, project)
-
+        project.extensions.create('gocdPlugin', GradleHelperExtension, project)
         project.tasks.create('extensionInfo', ExtensionInfoTask)
         project.tasks.create('githubRelease', GitHubReleaseTask)
         project.tasks.create('publishToS3', PublishToS3Task)
 
         project.afterEvaluate {
-            //TODO: Move it to doFirst of possible
+            //TODO: Move it to doFirst if possible
             GradleHelperExtension gocdPlugin = project.extensions.gocdPlugin
             gocdPlugin.pluginInfo.validate()
 

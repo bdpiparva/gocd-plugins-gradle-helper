@@ -16,7 +16,6 @@
 
 package cd.go.plugin.gradlehelper
 
-import cd.go.plugin.gradlehelper.license_report.LicenseReportConfig
 import cd.go.plugin.gradlehelper.models.GitHubReleaseInfo
 import cd.go.plugin.gradlehelper.models.PluginInfo
 import cd.go.plugin.gradlehelper.models.S3Config
@@ -24,7 +23,6 @@ import groovy.json.JsonBuilder
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.model.ObjectFactory
 
 @CompileStatic
 class GradleHelperExtension {
@@ -32,23 +30,17 @@ class GradleHelperExtension {
     boolean showJavaCompilationWarnings = true
     final PluginInfo pluginInfo
     final GitHubReleaseInfo github
-    final LicenseReportConfig licenseReport
     final S3Config s3
 
     @javax.inject.Inject
-    GradleHelperExtension(ObjectFactory objectFactory, Project project) {
-        pluginInfo = objectFactory.newInstance(PluginInfo, project)
-        github = objectFactory.newInstance(GitHubReleaseInfo)
-        licenseReport = objectFactory.newInstance(LicenseReportConfig, project)
-        s3 = objectFactory.newInstance(S3Config)
+    GradleHelperExtension(Project project) {
+        pluginInfo = new PluginInfo(project)
+        github = new GitHubReleaseInfo()
+        s3 = new S3Config()
     }
 
     void pluginInfo(Action<? super PluginInfo> action) {
         action.execute(pluginInfo)
-    }
-
-    void licenseReport(Action<? super LicenseReportConfig> action) {
-        action.execute(licenseReport)
     }
 
     void github(Action<? super GitHubReleaseInfo> action) {
@@ -62,9 +54,8 @@ class GradleHelperExtension {
     @Override
     String toString() {
         return new JsonBuilder(
-                ['prettyTestOutput'   : prettyTestOutput,
-                 'pluginInfo'         : pluginInfo.toHash(),
-                 'licenseReportConfig': licenseReport.toHash()
+                ['prettyTestOutput': prettyTestOutput,
+                 'pluginInfo'      : pluginInfo.toHash()
                 ]).toPrettyString()
     }
 }
