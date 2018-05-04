@@ -47,9 +47,6 @@ class GradleHelperPluginFunctionalTest extends Specification {
                     group = 'cd.go'
                     serverVersion = '18.2.0'
                 }
-                licenseReport {
-                    licenseCheck = true
-                }
             }
         """
 

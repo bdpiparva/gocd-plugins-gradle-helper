@@ -20,20 +20,28 @@ import cd.go.plugin.gradlehelper.pretty_test.PrettyTestLogger
 import cd.go.plugin.gradlehelper.tasks.ExtensionInfoTask
 import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
 import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
+import com.github.jk1.license.ReportTask
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.util.GradleVersion
 
 class GradleHelperPlugin implements Plugin<Project> {
+    private final def MINIMUM_REQUIRED_GRADLE_VERSION = "3.3"
+
     @Override
     void apply(Project project) {
+        assertCompatibleGradleVersion()
+
         project.pluginManager.apply(JavaPlugin.class)
         project.extensions.create('gocdPlugin', GradleHelperExtension, project)
         project.tasks.create('extensionInfo', ExtensionInfoTask)
         project.tasks.create('githubRelease', GitHubReleaseTask)
         project.tasks.create('publishToS3', PublishToS3Task)
+        project.tasks.create('generateLicenseReport', ReportTask)
 
         project.afterEvaluate {
             //TODO: Move it to doFirst if possible
@@ -76,6 +84,12 @@ class GradleHelperPlugin implements Plugin<Project> {
                 test.addTestListener(new PrettyTestLogger())
                 test.addTestOutputListener(new PrettyTestLogger())
             }
+        }
+    }
+
+    private void assertCompatibleGradleVersion() {
+        if (GradleVersion.current() < GradleVersion.version(MINIMUM_REQUIRED_GRADLE_VERSION)) {
+            throw new GradleException("License Report Plugin requires Gradle $MINIMUM_REQUIRED_GRADLE_VERSION. ${GradleVersion.current()} detected.")
         }
     }
 }

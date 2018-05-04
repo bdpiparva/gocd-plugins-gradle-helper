@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package cd.go.plugin.gradlehelper.models
+package com.github.jk1.license.render
 
-class ConfigurationInfo {
-    private String name
-    Set<ModuleInfo> moduleInfos = new HashSet<>()
+import com.github.jk1.license.ProjectData
 
-    ConfigurationInfo(String name) {
-        this.name = name
-    }
-}
 
-class ModuleInfo {
-
+interface ReportRenderer {
+    void render(ProjectData data)
 }

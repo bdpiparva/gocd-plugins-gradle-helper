@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package cd.go.plugin.gradlehelper.models
+package com.github.jk1.license.reader
 
-import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
+import org.gradle.api.GradleException
 
-class ProjectInfo {
-    private final Project project
-    private final Set<Configuration> toReport
+class UnresolvableConfigurationException extends GradleException {
 
-    ProjectInfo(Project project, Set<Configuration> toReport) {
-        this.toReport = toReport
-        this.project = project
+    UnresolvableConfigurationException(String message) {
+        super(message)
     }
 }
