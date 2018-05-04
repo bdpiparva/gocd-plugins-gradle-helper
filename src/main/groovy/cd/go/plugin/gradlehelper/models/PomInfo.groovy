@@ -16,16 +16,10 @@
 
 package cd.go.plugin.gradlehelper.models
 
-class ConfigurationInfo {
+class PomInfo {
     private String name
-    Set<ModuleInfo> moduleInfos = new HashSet<>()
-
-    ConfigurationInfo(String name) {
-        this.name = name
-    }
-
-    ModuleInfo addModuleInfo(String group, String name, String version) {
-        new ModuleInfo(group, name, version)
-    }
+    private String description
+    private String projectUrl
+    private String inceptionYear
+    Set<License> licenses
 }
-

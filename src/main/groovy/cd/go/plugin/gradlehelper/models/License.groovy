@@ -16,16 +16,14 @@
 
 package cd.go.plugin.gradlehelper.models
 
-class ConfigurationInfo {
+class License {
     private String name
-    Set<ModuleInfo> moduleInfos = new HashSet<>()
+    private String url
+    private String distribution
+    private String comments
 
-    ConfigurationInfo(String name) {
-        this.name = name
-    }
-
-    ModuleInfo addModuleInfo(String group, String name, String version) {
-        new ModuleInfo(group, name, version)
+    @Override
+    boolean equals(Object other) {
+        name == other
     }
 }
-

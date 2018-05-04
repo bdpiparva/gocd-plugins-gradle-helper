@@ -16,16 +16,6 @@
 
 package cd.go.plugin.gradlehelper.models
 
-class ConfigurationInfo {
-    private String name
-    Set<ModuleInfo> moduleInfos = new HashSet<>()
-
-    ConfigurationInfo(String name) {
-        this.name = name
-    }
-
-    ModuleInfo addModuleInfo(String group, String name, String version) {
-        new ModuleInfo(group, name, version)
-    }
+class LicenseFileData {
+    private Collection<LicenseFileDetails> fileDetails = []
 }
-
