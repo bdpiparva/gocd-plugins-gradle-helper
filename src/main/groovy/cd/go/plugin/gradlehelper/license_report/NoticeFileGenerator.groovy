@@ -16,31 +16,77 @@
 
 package cd.go.plugin.gradlehelper.license_report
 
+import com.github.jk1.license.ModuleData
 import com.github.jk1.license.ProjectData
 import com.github.jk1.license.render.ReportRenderer
 import com.github.jk1.license.render.SimpleHtmlReportRenderer
 import com.github.jk1.license.render.SingleInfoReportRenderer
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class NoticeFileGenerator extends SingleInfoReportRenderer implements ReportRenderer {
     ReportRenderer toDecorate
     String licenseFolder
+    final static List<String> allowedLicenses = [
+            'Apache License, Version 2.0',
+            'Apache 2',
+            'Apache 2.0',
+            'The Apache Software License, Version 2.0',
+            'The Apache License, Version 2.0',
+            'MIT license',
+            'The MIT License',
+    ]
 
     NoticeFileGenerator(String licenseFolder, List<String> allowedLicenses) {
         this.toDecorate = new TeeRenderer(new SimpleHtmlReportRenderer(), allowedLicenses)
         this.licenseFolder = licenseFolder
     }
 
+    NoticeFileGenerator(String licenseFolder) {
+        this(licenseFolder, allowedLicenses)
+    }
+
     @Override
     void render(ProjectData projectData) {
         toDecorate.render(projectData)
 
+        def noticeFile = new File(licenseFolder + 'NOTICE.txt')
+        List<String> allEntries = []
         projectData.allDependencies.collect { data ->
-            def noticeFile = new File(licenseFolder + 'NOTICE.txt')
-            if (!data.licenseFiles.empty) {
-                data.licenseFiles.first().files.collect { file ->
-                    if (new File(file).name.equals("NOTICE.txt")) {
-                        noticeFile.append(new File(licenseFolder + file).getText('UTF-8'))
-                        noticeFile.append('\n')
+            copyOverNoticeFile(allEntries, data)
+            addToNoticeFileFromPomData(allEntries, data)
+        }
+
+        noticeFile.append(allEntries.join("\n"))
+    }
+
+    private void addToNoticeFileFromPomData(List<String> allEntries, ModuleData data) {
+        if (!data.poms.empty) {
+            data.poms.each { pom ->
+                if (pom != null && pom.organization != null) {
+                    if (pom.organization.name && !allEntries.join(" ").contains(pom.organization.name)) {
+                        StringBuilder builder = new StringBuilder("This product includes software from the ")
+                        builder.append(pom.organization.name)
+                        if (pom.organization.url) {
+                            builder.append("($pom.organization.url)")
+                        }
+                        builder.append(",")
+                        pom.licenses.each { license ->
+                            builder.append("\n").append(license.name)
+                        }
+                        allEntries.add(builder.append("\n").toString())
+                    }
+                }
+            }
+        }
+    }
+
+    private void copyOverNoticeFile(List<String> allEntries, ModuleData data) {
+        if (!data.licenseFiles.empty) {
+            data.licenseFiles.each { licenseFileData ->
+                licenseFileData.files.each { file ->
+                    if (new File(file).name.equalsIgnoreCase("NOTICE.txt")) {
+                        allEntries.add(new File(licenseFolder + file).getText('UTF-8'))
                     }
                 }
             }

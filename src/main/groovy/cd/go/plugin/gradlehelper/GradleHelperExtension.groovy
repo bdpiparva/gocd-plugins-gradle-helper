@@ -16,9 +16,11 @@
 
 package cd.go.plugin.gradlehelper
 
+import cd.go.plugin.gradlehelper.license_report.NoticeFileGenerator
 import cd.go.plugin.gradlehelper.models.GitHubReleaseInfo
 import cd.go.plugin.gradlehelper.models.PluginInfo
 import cd.go.plugin.gradlehelper.models.S3Config
+import com.github.jk1.license.LicenseReportPlugin
 import groovy.json.JsonBuilder
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
@@ -31,12 +33,15 @@ class GradleHelperExtension {
     final PluginInfo pluginInfo
     final GitHubReleaseInfo github
     final S3Config s3
+    final LicenseReportPlugin.LicenseReportExtension licenseReport
 
     @javax.inject.Inject
     GradleHelperExtension(Project project) {
         pluginInfo = new PluginInfo(project)
         github = new GitHubReleaseInfo()
         s3 = new S3Config()
+        this.licenseReport = new LicenseReportPlugin.LicenseReportExtension(project)
+        this.licenseReport.renderer = new NoticeFileGenerator("${project.buildDir}/reports/dependency-license/")
     }
 
     void pluginInfo(Action<? super PluginInfo> action) {
@@ -49,6 +54,10 @@ class GradleHelperExtension {
 
     void s3(Action<? super S3Config> action) {
         action.execute(s3)
+    }
+
+    void licenseReport(Action<? super LicenseReportPlugin.LicenseReportExtension> action) {
+        action.execute(licenseReport)
     }
 
     @Override

@@ -20,6 +20,7 @@ import cd.go.plugin.gradlehelper.pretty_test.PrettyTestLogger
 import cd.go.plugin.gradlehelper.tasks.ExtensionInfoTask
 import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
 import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
+import com.github.jk1.license.LicenseReportPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -27,22 +28,38 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
 class GradleHelperPlugin implements Plugin<Project> {
+
     @Override
     void apply(Project project) {
-        project.pluginManager.apply(JavaPlugin.class)
-        project.extensions.create('gocdPlugin', GradleHelperExtension, project)
+        project.plugins.with {
+            apply LicenseReportPlugin
+            apply JavaPlugin
+        }
+        GradleHelperExtension gocdPlugin = project.extensions.create('gocdPlugin', GradleHelperExtension, project)
         project.tasks.create('extensionInfo', ExtensionInfoTask)
         project.tasks.create('githubRelease', GitHubReleaseTask)
         project.tasks.create('publishToS3', PublishToS3Task)
 
         project.afterEvaluate {
             //TODO: Move it to doFirst if possible
-            GradleHelperExtension gocdPlugin = project.extensions.gocdPlugin
+            initLicenseReportPlugin(project, gocdPlugin.licenseReport)
             gocdPlugin.pluginInfo.validate()
 
             setupProjectVersion(project, gocdPlugin)
             configurePrettyTestLogging(project, gocdPlugin)
             showCompilationWarnings(project, gocdPlugin)
+        }
+    }
+
+    private void initLicenseReportPlugin(Project project, LicenseReportPlugin.LicenseReportExtension licenseReport) {
+        project.licenseReport {
+            filters = licenseReport.filters
+            excludes = licenseReport.excludes
+            renderer = licenseReport.renderer
+            outputDir = licenseReport.outputDir
+            importers = licenseReport.importers
+            excludeGroups = licenseReport.excludeGroups
+            configurations = licenseReport.configurations
         }
     }
 
