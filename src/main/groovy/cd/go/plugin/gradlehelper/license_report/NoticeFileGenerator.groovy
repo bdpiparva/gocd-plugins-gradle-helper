@@ -22,9 +22,12 @@ import com.github.jk1.license.render.ReportRenderer
 import com.github.jk1.license.render.SimpleHtmlReportRenderer
 import com.github.jk1.license.render.SingleInfoReportRenderer
 import groovy.transform.CompileStatic
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
 @CompileStatic
 class NoticeFileGenerator extends SingleInfoReportRenderer implements ReportRenderer {
+    private static final Logger LOGGER = Logging.getLogger(NoticeFileGenerator.class)
     ReportRenderer toDecorate
     String licenseFolder
     final static List<String> allowedLicenses = [

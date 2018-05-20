@@ -19,18 +19,19 @@ package cd.go.plugin.gradlehelper.tasks
 import cd.go.plugin.gradlehelper.template.PluginProperties
 import cd.go.plugin.gradlehelper.template.PluginXML
 import groovy.text.GStringTemplateEngine
+import org.apache.commons.io.FileUtils
 
 class ProcessPluginResourcesTask extends AbstractTask {
 
     @Override
     void doTaskAction() {
+        FileUtils.copyFile(new File("${project.buildDir}/reports/dependency-license", "NOTICE.txt"), new File(resourceOutDir, 'NOTICE.txt'))
+        FileUtils.copyFile(new File("${project.buildDir}/reports/dependency-license", "index.html"), new File(resourceOutDir, 'license-report.html'))
+
         def engine = new GStringTemplateEngine()
-
-        logger.info pluginInfo.toHash().toString()
-
         [new PluginXML(), new PluginProperties()].each { template ->
             def expandedContent = engine.createTemplate(template.content()).make(pluginInfo.toHash().withDefault { '' })
-            def pluginResourceFile = new File(project.rootProject.projectDir.absolutePath + "/src/main/resources", template.name())
+            def pluginResourceFile = new File(resourceOutDir, template.name())
             logger.info "Writing plugin resource file ${pluginResourceFile.absolutePath}"
             pluginResourceFile.write(expandedContent.toString())
         }

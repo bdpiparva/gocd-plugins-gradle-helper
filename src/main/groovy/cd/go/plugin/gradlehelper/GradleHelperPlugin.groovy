@@ -21,11 +21,13 @@ import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
 import cd.go.plugin.gradlehelper.tasks.ProcessPluginResourcesTask
 import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
 import com.github.jk1.license.LicenseReportPlugin
+import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.tasks.Jar
 
 class GradleHelperPlugin implements Plugin<Project> {
 
@@ -36,21 +38,48 @@ class GradleHelperPlugin implements Plugin<Project> {
             apply JavaPlugin
         }
         GradleHelperExtension gocdPlugin = project.extensions.create('gocdPlugin', GradleHelperExtension, project)
-
         def processPluginResourcesTask = project.tasks.create('processPluginResources', ProcessPluginResourcesTask)
-//        processPluginResourcesTask.dependsOn "compileJava"
         project.tasks.create('githubRelease', GitHubReleaseTask)
         project.tasks.create('publishToS3', PublishToS3Task)
 
-        project.tasks.compileJava.dependsOn(processPluginResourcesTask)
         project.afterEvaluate {
             //TODO: Move it to doFirst if possible
             initLicenseReportPlugin(project, gocdPlugin.licenseReport)
             gocdPlugin.pluginInfo.validate()
+            processPluginResourcesTask.dependsOn('generateLicenseReport')
+            project.tasks.compileJava.dependsOn(processPluginResourcesTask)
+            handlePluginJar(project, gocdPlugin)
 
             setupProjectVersion(project, gocdPlugin)
             configurePrettyTestLogging(project, gocdPlugin)
             showCompilationWarnings(project, gocdPlugin)
+        }
+
+    }
+
+    private DomainObjectCollection<Jar> handlePluginJar(Project project, gocdPlugin) {
+        project.tasks.withType(Jar) { jarTask ->
+            jarTask.from(project.configurations.compile) {
+                jarTask.into "lib/"
+            }
+
+            ['MD5', 'SHA1', 'SHA-256'].each { algo ->
+                jarTask.outputs.files("${jarTask.archivePath}.${algo}")
+                jarTask.doLast {
+                    jarTask.ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
+                }
+            }
+
+            jarTask.manifest {
+                attributes(
+                        'Go-Version': gocdPlugin.pluginInfo.serverVersion,
+                        'Plugin-Revision': gocdPlugin.pluginInfo.version,
+                        'Implementation-Title': gocdPlugin.pluginInfo.name,
+                        'Implementation-Version': gocdPlugin.pluginInfo.fullVersion,
+                        'Source-Compatibility': project.sourceCompatibility,
+                        'Target-Compatibility': project.targetCompatibility
+                )
+            }
         }
     }
 
