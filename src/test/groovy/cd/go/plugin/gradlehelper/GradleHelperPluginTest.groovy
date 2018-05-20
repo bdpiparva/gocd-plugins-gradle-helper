@@ -16,34 +16,17 @@
 
 package cd.go.plugin.gradlehelper
 
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
-import spock.lang.Specification
-
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-class GradleHelperPluginTest extends Specification {
-    File testProjectDir = new File("build/test-project")
-    File buildFile
-    List<File> pluginClasspath
+class GradleHelperPluginTest extends BaseTest {
 
-    void setup() {
-        testProjectDir.deleteDir()
-        testProjectDir.mkdirs()
-        pluginClasspath = buildPluginClasspathWithTestClasspath()
-        buildFile = new File(testProjectDir, "build.gradle")
+    def "should generate notice file"() {
+        given:
         buildFile << """
-            plugins {
-                id 'cd.go.plugin.gradlehelper'
-            }
-            
             configurations {
                 forTesting
             }
-            repositories {
-                mavenCentral()
-            }
-
+           
             gocdPlugin {
                 pluginInfo {
                     id = 'cd.go.scm.github'
@@ -57,12 +40,7 @@ class GradleHelperPluginTest extends Specification {
                     configurations = ['forTesting'] 
                 }
             }
-        """
-    }
-
-    def "should generate license report"() {
-        given:
-        buildFile << """
+           
             dependencies {
                 forTesting "org.jetbrains:annotations:13.0"     // license-name: "The Apache Software License, Version 2.0"
                 forTesting "io.netty:netty-common:4.1.17.Final" // license-name: "Apache License, Version 2.0"
@@ -77,28 +55,22 @@ class GradleHelperPluginTest extends Specification {
         def result = runGradleBuild("generateLicenseReport")
 
         then:
-        def lines = new File(testProjectDir, "build/reports/dependency-license/NOTICE.txt").readLines()
-        println lines
-        println "================================"
-        println result.output
+        def actual = new File(testProjectDir, "build/reports/dependency-license/NOTICE.txt").readLines().join("\n")
+        def expected = "This product includes software from the Codehaus(http://codehaus.org),\n" +
+                "MIT license\n" +
+                "\n" +
+                "Apache Commons Lang\n" +
+                "Copyright 2001-2017 The Apache Software Foundation\n" +
+                "\n" +
+                "This product includes software developed at\n" +
+                "The Apache Software Foundation (http://www.apache.org/).\n" +
+                "\n" +
+                "This product includes software from the Spring Framework,\n" +
+                "under the Apache License 2.0 (see: StringUtils.containsWhitespace())\n" +
+                "\n" +
+                "This product includes software from the The Netty Project(http://netty.io/),\n" +
+                "Apache License, Version 2.0"
+        actual == expected
         result.task(":generateLicenseReport").outcome == SUCCESS
-    }
-
-    protected def runGradleBuild(String task, String... additionalArguments) {
-        List<String> args = [task, '--stacktrace']
-
-        GradleRunner.create()
-                .withProjectDir(testProjectDir)
-                .withArguments(args + Arrays.asList(additionalArguments))
-                .withPluginClasspath(pluginClasspath)
-                .forwardOutput()
-                .build()
-    }
-
-    static List<File> buildPluginClasspathWithTestClasspath() {
-        def classpath = PluginUnderTestMetadataReading.readImplementationClasspath()
-        return classpath + classpath.collect {
-            new File(it.parentFile, "test")
-        }
     }
 }

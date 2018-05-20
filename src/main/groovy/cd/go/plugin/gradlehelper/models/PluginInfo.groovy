@@ -57,7 +57,8 @@ class PluginInfo {
                 'serverVersion': serverVersion,
                 'distVersion'  : distVersion,
                 'gitRevision'  : gitRevision,
-                'fullVersion'  : fullVersion
+                'fullVersion'  : fullVersion,
+                'year'         : Calendar.getInstance().get(Calendar.YEAR)
         ]
     }
 

@@ -17,8 +17,8 @@
 package cd.go.plugin.gradlehelper
 
 import cd.go.plugin.gradlehelper.pretty_test.PrettyTestLogger
-import cd.go.plugin.gradlehelper.tasks.ExtensionInfoTask
 import cd.go.plugin.gradlehelper.tasks.GitHubReleaseTask
+import cd.go.plugin.gradlehelper.tasks.ProcessPluginResourcesTask
 import cd.go.plugin.gradlehelper.tasks.PublishToS3Task
 import com.github.jk1.license.LicenseReportPlugin
 import org.gradle.api.Plugin
@@ -36,10 +36,13 @@ class GradleHelperPlugin implements Plugin<Project> {
             apply JavaPlugin
         }
         GradleHelperExtension gocdPlugin = project.extensions.create('gocdPlugin', GradleHelperExtension, project)
-        project.tasks.create('extensionInfo', ExtensionInfoTask)
+
+        def processPluginResourcesTask = project.tasks.create('processPluginResources', ProcessPluginResourcesTask)
+//        processPluginResourcesTask.dependsOn "compileJava"
         project.tasks.create('githubRelease', GitHubReleaseTask)
         project.tasks.create('publishToS3', PublishToS3Task)
 
+        project.tasks.compileJava.dependsOn(processPluginResourcesTask)
         project.afterEvaluate {
             //TODO: Move it to doFirst if possible
             initLicenseReportPlugin(project, gocdPlugin.licenseReport)
